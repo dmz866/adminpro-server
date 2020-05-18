@@ -16,7 +16,9 @@ app.get('/', (req, res) => {
             ok: true,
             medicos
         });
-    });
+    })
+    .populate('usuario', 'nombre email')
+    .populate('hospital', 'nombre');
 });
 
 app.post('/', verificaToken, (req, res) => {

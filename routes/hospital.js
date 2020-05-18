@@ -3,8 +3,10 @@ var express = require('express');
 var app = express();
 var Hospital = require('../models/hospital');
 
-
 app.get('/', (req, res) => {
+    const desde = req.query.desde || 0;
+    const hasta = req.query.hasta || 5;
+
     Hospital.find({}, (error, hospitales) => {
         if(error) {
             return res.status(400).json({
@@ -12,12 +14,18 @@ app.get('/', (req, res) => {
                 error
             });
         }
-
-        return res.json({
-            ok: true,
-            hospitales
+        
+        Hospital.count((error, total) => {
+            return res.json({
+                ok: true,
+                total,
+                hospitales
+            });
         });
-    });
+    })
+    .populate('usuario', 'nombre email')
+    .skip(desde)
+    .limit(hasta);
 });
 
 app.post('/', verificaToken, (req, res) => {
